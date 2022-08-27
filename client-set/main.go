@@ -5,10 +5,8 @@ import (
 	"flag"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/rest"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	"path/filepath"
@@ -29,29 +27,20 @@ func main() {
 		panic(err.Error())
 	}
 
-	// 参考: /api/v1/namespaces/{namespace}/deployment
-	config.APIPath = "api"
-	config.GroupVersion = &corev1.SchemeGroupVersion
-	config.NegotiatedSerializer = scheme.Codecs
-
-	restClient, err := rest.RESTClientFor(config)
+	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	result := &corev1.PodList{}
-	err = restClient.
-		Get().
-		Namespace("default").
-		Resource("pods").
-		VersionedParams(&metav1.ListOptions{}, scheme.ParameterCodec).
-		Do(context.TODO()).
-		Into(result)
+	pods, err := clientset.
+		CoreV1().
+		Pods("default").
+		List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
 
-	for _, item := range result.Items {
+	for _, item := range pods.Items {
 		fmt.Printf("ns: %s, name: %s, status: %s\n", item.Namespace, item.Name, item.Status.Phase)
 	}
 }
