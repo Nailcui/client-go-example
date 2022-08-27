@@ -8,3 +8,5 @@
 [ClientSet Example](https://github.com/Nailcui/client-go-example/tree/master/client-set)
 
 [DynamicClient Example](https://github.com/Nailcui/client-go-example/tree/master/dynamic-client)
+
+[DiscoveryClient Example](https://github.com/Nailcui/client-go-example/tree/master/discovery-client)
